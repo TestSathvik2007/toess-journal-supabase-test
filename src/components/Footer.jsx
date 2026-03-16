@@ -265,7 +265,7 @@ export default function Footer() {
                 { to: "/submit", label: "Submit Manuscript" },
                 { to: "/guidelines", label: "Author Guidelines" },
                 { to: "/publication-policy", label: "Publication Policy" },
-                { to: "/peer-review", label: "Peer Review Process" },
+                { to: "/peer-review", label: "Peer Review Policy" },
                 { to: "/faqs", label: "FAQs" },
               ].map(({ to, label }) => (
                 <li key={to}>

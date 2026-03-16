@@ -14,6 +14,12 @@ import Contact from "./pages/Contact";
 import EditorialBoard from "./pages/EditorialBoard";
 import CurrentIssue from "./pages/CurrentIssue";
 
+/* ================= ARCHIVES ================= */
+import LatestArticles from "./pages/archives/LatestArticles";
+import Volumes from "./pages/archives/Volumes";
+import IssuePapers from "./pages/archives/IssuePapers";
+import SpecialIssues from "./pages/archives/SpecialIssues";
+
 /* ================= AUTH ================= */
 import AuthCallback from "./pages/AuthCallback";
 
@@ -147,6 +153,13 @@ export default function App() {
           <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
           <Route path="/editorial-board" element={<MainLayout><EditorialBoard /></MainLayout>} />
           <Route path="/current-issue" element={<MainLayout><CurrentIssue /></MainLayout>} />
+
+          {/* ================= ARCHIVES ================= */}
+          <Route path="/archives/latest" element={<MainLayout><LatestArticles /></MainLayout>} />
+          <Route path="/archives/current" element={<MainLayout><CurrentIssue /></MainLayout>} />
+          <Route path="/archives/volumes" element={<MainLayout><Volumes /></MainLayout>} />
+          <Route path="/archives/issue/:volume/:issue" element={<MainLayout><IssuePapers /></MainLayout>} />
+          <Route path="/archives/special" element={<MainLayout><SpecialIssues /></MainLayout>} />
 
           {/* ================= USEFUL ================= */}
           <Route path="/plagiarism-policy" element={<MainLayout><PlagiarismPolicy /></MainLayout>} />

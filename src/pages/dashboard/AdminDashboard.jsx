@@ -12,12 +12,12 @@ import { sendPaperPublishedEmail } from "../../services/emailService";
 import Modal from "../../components/Modal";
 
 const STATUS_CONFIG = {
-  submitted:          { label: "Submitted",        color: "bg-amber-50 text-amber-700 border-amber-200",       icon: Clock },
-  under_review:       { label: "Under Review",     color: "bg-blue-50 text-blue-700 border-blue-200",          icon: Eye },
-  revision_requested: { label: "Revision Required",color: "bg-orange-50 text-orange-700 border-orange-200",   icon: RotateCcw },
-  accepted:           { label: "Accepted",         color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle },
-  rejected:           { label: "Rejected",         color: "bg-rose-50 text-rose-700 border-rose-200",          icon: XCircle },
-  published:          { label: "Published",        color: "bg-indigo-50 text-indigo-700 border-indigo-200",    icon: TrendingUp },
+  submitted:          { label: "Submitted",         color: "bg-amber-50 text-amber-700 border-amber-200",       icon: Clock },
+  under_review:       { label: "Under Review",      color: "bg-blue-50 text-blue-700 border-blue-200",          icon: Eye },
+  revision_requested: { label: "Revision Required", color: "bg-orange-50 text-orange-700 border-orange-200",    icon: RotateCcw },
+  accepted:           { label: "Accepted",          color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle },
+  rejected:           { label: "Rejected",          color: "bg-rose-50 text-rose-700 border-rose-200",          icon: XCircle },
+  published:          { label: "Published",         color: "bg-indigo-50 text-indigo-700 border-indigo-200",    icon: TrendingUp },
 };
 
 const StatusBadge = ({ status }) => {
@@ -31,16 +31,37 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+/* ── small labelled input used in the publish modal ── */
+const FieldInput = ({ label, value, onChange, min = 1 }) => (
+  <div className="flex-1">
+    <label className="block text-xs font-semibold text-slate-600 mb-1">{label}</label>
+    <input
+      type="number"
+      min={min}
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+    />
+  </div>
+);
+
 export default function AdminDashboard() {
-  const [submissions, setSubmissions]   = useState([]);
-  const [assignments, setAssignments]   = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [filter, setFilter]             = useState("all");
+  const [submissions, setSubmissions]     = useState([]);
+  const [assignments, setAssignments]     = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [filter, setFilter]               = useState("all");
   const [selectedPaper, setSelectedPaper] = useState(null);
-  const [viewMode, setViewMode]         = useState("table");
-  const [error, setError]               = useState(null);
+  const [viewMode, setViewMode]           = useState("table");
+  const [error, setError]                 = useState(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [expandedRow, setExpandedRow]   = useState(null);
+  const [expandedRow, setExpandedRow]     = useState(null);
+
+  /* publish modal state */
+  const [publishTarget, setPublishTarget] = useState(null); // paper being published
+  const [pubVolume, setPubVolume]         = useState(1);
+  const [pubIssue, setPubIssue]           = useState(1);
+  const [publishing, setPublishing]       = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,21 +86,54 @@ export default function AdminDashboard() {
     loadData();
   }, []);
 
-  const publishPaper = async (paper) => {
+  /* open the publish modal pre-filled with sensible defaults */
+  const openPublishModal = (paper) => {
+    // default to the next volume/issue beyond what's already published
+    const published = submissions.filter((p) => p.status === "published");
+    const maxVol    = published.length ? Math.max(...published.map((p) => p.volume  || 1)) : 1;
+    const maxIssue  = published.filter((p) => (p.volume || 1) === maxVol).length
+      ? Math.max(...published.filter((p) => (p.volume || 1) === maxVol).map((p) => p.issue || 1))
+      : 1;
+    setPubVolume(maxVol);
+    setPubIssue(maxIssue);
+    setPublishTarget(paper);
+  };
+
+  const confirmPublish = async () => {
+    if (!publishTarget) return;
+    setPublishing(true);
     try {
-      const doi = `10.1234/toess.v1i1.${paper.id.slice(0, 4)}`;
-      const publishData = { status: "published", updated_at: new Date().toISOString() };
-      await updateSubmission(paper.id, publishData);
+      const year = new Date().getFullYear();
+      const doi  = `10.1234/toess.v${pubVolume}i${pubIssue}.${publishTarget.id.slice(0, 4)}`;
+
+      const publishData = {
+        status:         "published",
+        volume:         pubVolume,
+        issue:          pubIssue,
+        published_year: year,
+        updated_at:     new Date().toISOString(),
+      };
+
+      await updateSubmission(publishTarget.id, publishData);
+
       await sendPaperPublishedEmail({
-        authorEmail: paper.users?.email,
-        authorName: `${paper.users?.given_name || ""} ${paper.users?.family_name || ""}`.trim(),
-        paperTitle: paper.title, doi,
+        authorEmail: publishTarget.users?.email,
+        authorName:  `${publishTarget.users?.given_name || ""} ${publishTarget.users?.family_name || ""}`.trim(),
+        paperTitle:  publishTarget.title,
+        doi,
       });
-      setSubmissions((prev) => prev.map((p) => p.id === paper.id ? { ...p, ...publishData } : p));
+
+      setSubmissions((prev) =>
+        prev.map((p) => p.id === publishTarget.id ? { ...p, ...publishData } : p)
+      );
+
+      setPublishTarget(null);
       setSelectedPaper(null);
     } catch (err) {
       console.error("Error publishing:", err);
-      alert("Failed to publish paper");
+      alert("Failed to publish paper. Please try again.");
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -96,10 +150,10 @@ export default function AdminDashboard() {
   };
 
   const navItems = [
-    { label: "Reviewer Applications", path: "/dashboard/admin/manage-reviewers",  icon: UserCheck,  from: "from-teal-600",   to: "to-cyan-600" },
-    { label: "Assign Reviewers",       path: "/dashboard/admin/assign-reviewers", icon: Users,      from: "from-green-600",  to: "to-emerald-600" },
-    { label: "Editorial Decisions",    path: "/dashboard/admin/review-decisions", icon: CheckCircle,from: "from-indigo-600", to: "to-blue-600" },
-    { label: "Special Issues",         path: "/dashboard/admin/special-issues",   icon: Sparkles,   from: "from-purple-600", to: "to-indigo-600" },
+    { label: "Reviewer Applications", path: "/dashboard/admin/manage-reviewers",  icon: UserCheck,   from: "from-teal-600",   to: "to-cyan-600" },
+    { label: "Assign Reviewers",       path: "/dashboard/admin/assign-reviewers", icon: Users,       from: "from-green-600",  to: "to-emerald-600" },
+    { label: "Editorial Decisions",    path: "/dashboard/admin/review-decisions", icon: CheckCircle, from: "from-indigo-600", to: "to-blue-600" },
+    { label: "Special Issues",         path: "/dashboard/admin/special-issues",   icon: Sparkles,    from: "from-purple-600", to: "to-indigo-600" },
   ];
 
   if (loading) return (
@@ -175,8 +229,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* ── Stats grid ──
-            2-col on xs, 4-col on sm, 7-col on lg */}
+        {/* ── Stats grid ── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
           {[
             { label: "Total",        value: stats.total,       icon: FileText,    color: "indigo" },
@@ -200,10 +253,10 @@ export default function AdminDashboard() {
         {/* ── Quick action cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { label: "Reviewer Applications", sub: "Approve or reject",    path: "/dashboard/admin/manage-reviewers",  icon: UserCheck,  from: "from-teal-600",   to: "to-cyan-600",    text: "text-teal-100" },
-            { label: "Assign Reviewers",       sub: "Manage assignments",  path: "/dashboard/admin/assign-reviewers", icon: Users,      from: "from-green-600",  to: "to-emerald-600", text: "text-green-100" },
-            { label: "Editorial Decisions",    sub: "Make final decisions",path: "/dashboard/admin/review-decisions", icon: CheckCircle,from: "from-indigo-600", to: "to-blue-600",    text: "text-blue-100" },
-            { label: "Special Issues",         sub: "Manage special issues",path: "/dashboard/admin/special-issues",  icon: Sparkles,   from: "from-purple-600", to: "to-indigo-600",  text: "text-purple-100" },
+            { label: "Reviewer Applications", sub: "Approve or reject",     path: "/dashboard/admin/manage-reviewers",  icon: UserCheck,   from: "from-teal-600",   to: "to-cyan-600",    text: "text-teal-100" },
+            { label: "Assign Reviewers",       sub: "Manage assignments",   path: "/dashboard/admin/assign-reviewers", icon: Users,       from: "from-green-600",  to: "to-emerald-600", text: "text-green-100" },
+            { label: "Editorial Decisions",    sub: "Make final decisions", path: "/dashboard/admin/review-decisions", icon: CheckCircle, from: "from-indigo-600", to: "to-blue-600",    text: "text-blue-100" },
+            { label: "Special Issues",         sub: "Manage special issues",path: "/dashboard/admin/special-issues",   icon: Sparkles,    from: "from-purple-600", to: "to-indigo-600",  text: "text-purple-100" },
           ].map(({ label, sub, path, icon: Icon, from, to, text }) => (
             <button key={label} onClick={() => navigate(path)}
               className={`bg-gradient-to-br ${from} ${to} text-white p-4 sm:p-5 rounded-xl shadow-md hover:shadow-lg hover:opacity-95 transition text-left w-full`}>
@@ -223,7 +276,6 @@ export default function AdminDashboard() {
         {/* ── Filters + view toggle ── */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3 sm:p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            {/* Scrollable filter pills */}
             <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
               <button onClick={() => setFilter("all")}
                 className={`shrink-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition ${filter === "all" ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
@@ -236,7 +288,6 @@ export default function AdminDashboard() {
                 </button>
               ))}
             </div>
-            {/* View toggle */}
             <div className="flex gap-1 shrink-0 self-end sm:self-auto">
               {["table", "cards"].map((mode) => (
                 <button key={mode} onClick={() => setViewMode(mode)}
@@ -269,7 +320,7 @@ export default function AdminDashboard() {
         {viewMode === "table" && filtered.length > 0 && (
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
 
-            {/* Desktop table (md+) */}
+            {/* Desktop table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200">
@@ -334,14 +385,14 @@ export default function AdminDashboard() {
                               </a>
                             )}
                             {p.status === "accepted" && (
-                              <button onClick={() => publishPaper(p)}
+                              <button onClick={() => openPublishModal(p)}
                                 className="px-2.5 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition flex items-center gap-1 whitespace-nowrap">
                                 <TrendingUp className="w-3 h-3" /> Publish
                               </button>
                             )}
                             {p.status === "published" && (
                               <span className="px-2.5 py-1 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-lg whitespace-nowrap">
-                                Published ✓
+                                Vol {p.volume} · Iss {p.issue} ✓
                               </span>
                             )}
                           </div>
@@ -353,7 +404,7 @@ export default function AdminDashboard() {
               </table>
             </div>
 
-            {/* Mobile accordion (< md) */}
+            {/* Mobile accordion */}
             <div className="md:hidden divide-y divide-slate-100">
               {filtered.map((p) => {
                 const authorName = `${p.users?.given_name || ""} ${p.users?.family_name || ""}`.trim() || "N/A";
@@ -380,10 +431,10 @@ export default function AdminDashboard() {
                       <div className="px-4 pb-4 space-y-3">
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           {[
-                            { label: "Article Type",     value: p.article_type || "Regular" },
-                            { label: "Submission Type",  value: p.submission_type || "Regular", purple: p.submission_type === "Special Issue" },
-                            { label: "Category",         value: p.category || "—" },
-                            { label: "Email",            value: p.users?.email || "—" },
+                            { label: "Article Type",    value: p.article_type || "Regular" },
+                            { label: "Submission Type", value: p.submission_type || "Regular", purple: p.submission_type === "Special Issue" },
+                            { label: "Category",        value: p.category || "—" },
+                            { label: "Email",           value: p.users?.email || "—" },
                           ].map(({ label, value, purple }) => (
                             <div key={label} className="bg-slate-50 rounded-lg p-2.5">
                               <p className="text-slate-400 mb-0.5">{label}</p>
@@ -403,7 +454,7 @@ export default function AdminDashboard() {
                             </a>
                           )}
                           {p.status === "accepted" && (
-                            <button onClick={() => publishPaper(p)}
+                            <button onClick={() => openPublishModal(p)}
                               className="flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-1">
                               <TrendingUp className="w-3.5 h-3.5" /> Publish
                             </button>
@@ -463,7 +514,7 @@ export default function AdminDashboard() {
                       </a>
                     )}
                     {p.status === "accepted" && (
-                      <button onClick={() => publishPaper(p)}
+                      <button onClick={() => openPublishModal(p)}
                         className="flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition flex items-center justify-center gap-1">
                         <TrendingUp className="w-3.5 h-3.5" /> Publish
                       </button>
@@ -476,118 +527,217 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* ── Detail Modal ── */}
+      {/* ══════════════════════════════════════════
+          Publish Modal — volume / issue picker
+      ══════════════════════════════════════════ */}
+      {publishTarget && (
+        <Modal onClose={() => !publishing && setPublishTarget(null)}>
+          {(close) => (
+            <>
+              <div className="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between z-10">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-indigo-600" />
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900">Publish Paper</h2>
+                </div>
+                {!publishing && (
+                  <button onClick={close} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition">
+                    <X className="w-5 h-5 text-slate-500" />
+                  </button>
+                )}
+              </div>
+
+              <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
+
+                {/* Paper title */}
+                <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 sm:p-4">
+                  <p className="text-xs text-indigo-500 font-medium mb-1">Publishing</p>
+                  <p className="text-sm font-semibold text-indigo-900 leading-snug line-clamp-3">
+                    {publishTarget.title}
+                  </p>
+                </div>
+
+                {/* Volume / Issue inputs */}
+                <div>
+                  <p className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                    Assign to Issue
+                  </p>
+                  <div className="flex gap-3">
+                    <FieldInput label="Volume" value={pubVolume} onChange={setPubVolume} />
+                    <FieldInput label="Issue"  value={pubIssue}  onChange={setPubIssue}  />
+                    <div className="flex-1">
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Year</label>
+                      <input
+                        type="number"
+                        disabled
+                        value={new Date().getFullYear()}
+                        className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 text-slate-400 cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* DOI preview */}
+                <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
+                  <p className="text-xs text-slate-400 mb-1">DOI Preview</p>
+                  <p className="text-xs font-mono text-slate-700 break-all">
+                    10.1234/toess.v{pubVolume}i{pubIssue}.{publishTarget.id.slice(0, 4)}
+                  </p>
+                </div>
+
+                {/* Archive path preview */}
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <span className="px-2 py-1 bg-slate-100 rounded font-medium">Archives</span>
+                  <ChevronDown className="w-3 h-3 -rotate-90" />
+                  <span className="px-2 py-1 bg-slate-100 rounded font-medium">Volume {pubVolume}</span>
+                  <ChevronDown className="w-3 h-3 -rotate-90" />
+                  <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded font-medium">Issue {pubIssue}</span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-2 border-t border-slate-200">
+                  <button onClick={() => setPublishTarget(null)} disabled={publishing}
+                    className="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition text-sm disabled:opacity-50">
+                    Cancel
+                  </button>
+                  <button onClick={confirmPublish} disabled={publishing}
+                    className="flex-1 px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2 text-sm disabled:opacity-70">
+                    {publishing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Publishing…
+                      </>
+                    ) : (
+                      <>
+                        <TrendingUp className="w-4 h-4" /> Confirm Publish
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </Modal>
+      )}
+
+      {/* ══════════════════════════════════════════
+          Detail Modal
+      ══════════════════════════════════════════ */}
       {selectedPaper && (
         <Modal onClose={() => setSelectedPaper(null)}>
           {(close) => (
             <>
-            <div className="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between z-10">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">Manuscript Details</h2>
-              <button onClick={close} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition">
-                <X className="w-5 h-5 text-slate-500" />
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 sm:mb-3 leading-snug">
-                  {selectedPaper.title}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  <StatusBadge status={selectedPaper.status} />
-                  {selectedPaper.category && (
-                    <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">
-                      {selectedPaper.category}
-                    </span>
-                  )}
-                  {selectedPaper.submission_type && (
-                    <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${selectedPaper.submission_type === "Special Issue" ? "bg-purple-100 text-purple-700" : "bg-slate-100 text-slate-600"}`}>
-                      {selectedPaper.submission_type}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                {[
-                  { label: "Author",        value: `${selectedPaper.users?.given_name || ""} ${selectedPaper.users?.family_name || ""}`.trim() || "N/A" },
-                  { label: "Email",         value: selectedPaper.users?.email || "—" },
-                  { label: "Submitted",     value: selectedPaper.created_at ? new Date(selectedPaper.created_at).toLocaleDateString() : "—" },
-                  { label: "Article Type",  value: selectedPaper.article_type || "Regular" },
-                  { label: "Manuscript ID", value: selectedPaper.manuscript_id || "—" },
-                ].map(({ label, value }) => (
-                  <div key={label} className="bg-slate-50 rounded-lg p-2.5 sm:p-3">
-                    <p className="text-xs text-slate-400 mb-0.5">{label}</p>
-                    <p className="font-medium text-slate-800 text-xs sm:text-sm break-all">{value}</p>
-                  </div>
-                ))}
-              </div>
-
-              {selectedPaper.abstract && (
-                <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Abstract</h4>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50 rounded-lg p-3">
-                    {selectedPaper.abstract}
-                  </p>
-                </div>
-              )}
-
-              {selectedPaper.keywords?.length > 0 && (
-                <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Keywords</h4>
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {(Array.isArray(selectedPaper.keywords)
-                      ? selectedPaper.keywords
-                      : selectedPaper.keywords.split(",")
-                    ).map((kw, i) => (
-                      <span key={i} className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-full">{kw.trim()}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedPaper.paper_authors?.length > 0 && (
-                <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Authors</h4>
-                  <div className="space-y-2">
-                    {selectedPaper.paper_authors.map((author, i) => (
-                      <div key={i} className="p-2.5 sm:p-3 bg-slate-50 rounded-lg text-xs sm:text-sm">
-                        <p className="font-medium text-slate-900">
-                          {author.full_name}{" "}
-                          {author.is_corresponding && (
-                            <span className="text-xs text-indigo-600 font-normal">(Corresponding)</span>
-                          )}
-                        </p>
-                        <p className="text-xs text-slate-500 mt-0.5">{author.institution} · {author.email}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedPaper.file_url ? (
-                <a href={selectedPaper.file_url} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition">
-                  <Download className="w-4 h-4" /> Download Full Paper (PDF)
-                </a>
-              ) : (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-xs sm:text-sm">
-                  No manuscript file attached to this submission.
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-slate-200">
-                {selectedPaper.status === "accepted" && (
-                  <button onClick={() => publishPaper(selectedPaper)}
-                    className="flex-1 px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
-                    <TrendingUp className="w-4 h-4" /> Publish Paper
-                  </button>
-                )}
-                <button className="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
-                  <Send className="w-4 h-4" /> Contact Author
+              <div className="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between z-10">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900">Manuscript Details</h2>
+                <button onClick={close} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition">
+                  <X className="w-5 h-5 text-slate-500" />
                 </button>
               </div>
-            </div>
+
+              <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 sm:mb-3 leading-snug">
+                    {selectedPaper.title}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <StatusBadge status={selectedPaper.status} />
+                    {selectedPaper.category && (
+                      <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">
+                        {selectedPaper.category}
+                      </span>
+                    )}
+                    {selectedPaper.submission_type && (
+                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${selectedPaper.submission_type === "Special Issue" ? "bg-purple-100 text-purple-700" : "bg-slate-100 text-slate-600"}`}>
+                        {selectedPaper.submission_type}
+                      </span>
+                    )}
+                    {selectedPaper.status === "published" && selectedPaper.volume && (
+                      <span className="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">
+                        Vol {selectedPaper.volume}, Iss {selectedPaper.issue} · {selectedPaper.published_year}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                  {[
+                    { label: "Author",        value: `${selectedPaper.users?.given_name || ""} ${selectedPaper.users?.family_name || ""}`.trim() || "N/A" },
+                    { label: "Email",         value: selectedPaper.users?.email || "—" },
+                    { label: "Submitted",     value: selectedPaper.created_at ? new Date(selectedPaper.created_at).toLocaleDateString() : "—" },
+                    { label: "Article Type",  value: selectedPaper.article_type || "Regular" },
+                    { label: "Manuscript ID", value: selectedPaper.manuscript_id || "—" },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="bg-slate-50 rounded-lg p-2.5 sm:p-3">
+                      <p className="text-xs text-slate-400 mb-0.5">{label}</p>
+                      <p className="font-medium text-slate-800 text-xs sm:text-sm break-all">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {selectedPaper.abstract && (
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Abstract</h4>
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50 rounded-lg p-3">
+                      {selectedPaper.abstract}
+                    </p>
+                  </div>
+                )}
+
+                {selectedPaper.keywords?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Keywords</h4>
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      {(Array.isArray(selectedPaper.keywords)
+                        ? selectedPaper.keywords
+                        : selectedPaper.keywords.split(",")
+                      ).map((kw, i) => (
+                        <span key={i} className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-full">{kw.trim()}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedPaper.paper_authors?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Authors</h4>
+                    <div className="space-y-2">
+                      {selectedPaper.paper_authors.map((author, i) => (
+                        <div key={i} className="p-2.5 sm:p-3 bg-slate-50 rounded-lg text-xs sm:text-sm">
+                          <p className="font-medium text-slate-900">
+                            {author.full_name}{" "}
+                            {author.is_corresponding && (
+                              <span className="text-xs text-indigo-600 font-normal">(Corresponding)</span>
+                            )}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-0.5">{author.institution} · {author.email}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedPaper.file_url ? (
+                  <a href={selectedPaper.file_url} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition">
+                    <Download className="w-4 h-4" /> Download Full Paper (PDF)
+                  </a>
+                ) : (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-xs sm:text-sm">
+                    No manuscript file attached to this submission.
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-slate-200">
+                  {selectedPaper.status === "accepted" && (
+                    <button onClick={() => { setSelectedPaper(null); openPublishModal(selectedPaper); }}
+                      className="flex-1 px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                      <TrendingUp className="w-4 h-4" /> Publish Paper
+                    </button>
+                  )}
+                  <button className="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <Send className="w-4 h-4" /> Contact Author
+                  </button>
+                </div>
+              </div>
             </>
           )}
         </Modal>

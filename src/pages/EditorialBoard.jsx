@@ -13,8 +13,6 @@ export default function EditorialBoard() {
       {/* Hero Header */}
       <section className="relative bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white py-14 md:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItaDJsLTItMnptMC00aDJ2Mmg1djJoLTV2Mmg1djJoLTV2Mmg1djJoLTV2Mmgydi0yaC0ydi0yaC0ydi0yaC0ydi0yaC0ydi0yaDJ2LTJoMnYtMmgydi0yaDJ2LTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-10"></div>
-        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center relative z-10">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 md:w-20 md:h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
@@ -25,11 +23,9 @@ export default function EditorialBoard() {
             Editorial Board
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-indigo-100 max-w-3xl mx-auto leading-relaxed px-2">
-            Our distinguished editorial board comprises leading experts from around the world, 
+            Our distinguished editorial board comprises leading experts from around the world,
             dedicated to maintaining the highest standards of academic excellence and integrity.
           </p>
-          
-          {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-8 md:mt-12 max-w-4xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 md:p-4 border border-white/20">
               <div className="text-2xl md:text-3xl font-bold">40+</div>
@@ -75,7 +71,7 @@ export default function EditorialBoard() {
           </div>
         </BoardSection>
 
-        {/* Deputy Editors */}
+        {/* Deputy Editors-in-Chief */}
         <BoardSection
           id="deputy-editors"
           title="Deputy Editors-in-Chief"
@@ -87,11 +83,13 @@ export default function EditorialBoard() {
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             <MemberCardPro name="Dr. Qin Xin" credentials="Professor" affiliation="University of the Faroe Islands" location="Denmark" email="qinx@setur.fo" role="Deputy Editor-in-Chief" />
-            <MemberCardPro name="Dr. Thompson Stephan" credentials="Ph.D." affiliation="Gulf Medical University, Ajman" location="UAE" email="dr.thompson.s@gmu.ac.ae" role="Deputy Editor-in-Chief" />
-            <MemberCardPro name="Dr. Vinaytosh Mishra" credentials="Ph.D., Professor" affiliation="Gulf Medical University, Ajman" location="UAE" email="dr.vinaytosh@gmu.ac.ae" role="Deputy Editor-in-Chief" />
+            <MemberCardPro name="Dr. Dac-Nhuong Le" credentials="Ph.D., Dean & Professor" affiliation="Faculty of Information Technology, Haiphong University" location="Vietnam" email="Nhuongld@hus.edu.vn" role="Deputy Editor-in-Chief" />
+            <MemberCardPro name="Dr. Basim Mohammad Fadel Alhadidi" credentials="Ph.D., Professor" affiliation="Al-Balqa Applied University" location="Jordan" email="b_hadidi@bau.edu.jo" role="Deputy Editor-in-Chief" />
+            <MemberCardPro name="Dr. Thompson Stephan" credentials="Ph.D." affiliation="Thumbay College of Management and AI in Healthcare, Gulf Medical University" location="Ajman, UAE" email="dr.thompson.s@gmu.ac.ae" role="Deputy Editor-in-Chief" />
+            <MemberCardPro name="Dr. Arvind. K. S." credentials="Ph.D., PDF (Singapore), Professor" affiliation="Jain (Deemed-to-be University)" location="India" email="ks.arvind@jainuniversity.ac.in" role="Deputy Editor-in-Chief" />
+            <MemberCardPro name="Dr. Vinaytosh Mishra" credentials="Ph.D., Professor" affiliation="Thumbay College of Management and AI in Healthcare, Gulf Medical University" location="Ajman, UAE" email="dr.vinaytosh@gmu.ac.ae" role="Deputy Editor-in-Chief" />
             <MemberCardPro name="Dr. Balajee Alphonse" credentials="Ph.D., Program Coordinator & Professor" affiliation="Jain (Deemed-to-be University)" location="India" email="balajee.a@jainuniversity.ac.in" role="Deputy Editor-in-Chief" />
             <MemberCardPro name="Dr. Chandrasekar. V" credentials="Ph.D., PDF (USA), Program Head & Professor – AI & ML" affiliation="Jain (Deemed-to-be University)" location="India" email="chandrasekar.v@jainuniversity.ac.in" role="Deputy Editor-in-Chief" />
-            <MemberCardPro name="Dr. Arvind. K. S." credentials="Ph.D., PDF (Singapore), Professor" affiliation="Jain (Deemed-to-be University)" location="India" email="ks.arvind@jainuniversity.ac.in" role="Deputy Editor-in-Chief" />
           </div>
         </BoardSection>
 
@@ -106,16 +104,14 @@ export default function EditorialBoard() {
           onToggle={() => toggleSection('associate-editors')}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-            <MemberCardPro name="Dr. Dac-Nhuong Le" credentials="Ph.D., Dean & Professor" affiliation="Faculty of Information Technology, Haiphong University" location="Vietnam" email="Nhuongld@hus.edu.vn" role="Associate Editor" />
-            <MemberCardPro name="Dr. Basim Mohammad Fadel Alhadidi" credentials="Ph.D., Professor" affiliation="Al-Balqa Applied University" location="Jordan" email="b_hadidi@bau.edu.jo" role="Associate Editor" />
-            <MemberCardPro name="Dr. Rajan John" credentials="Ph.D., Professor" affiliation="Department of Computer Science, Jazan University" location="Saudi Arabia" email="rsubbaiah@jazanu.edu.sa" role="Associate Editor" />
-            <MemberCardPro name="Dr. Nagarajan. S." credentials="Professor" affiliation="Department of Mechanical and Industrial Engineering, Bahir Dar University" location="Ethiopia" email="drnagarajans@bdu.edu.et" role="Associate Editor" />
             <MemberCardPro name="Mr. Shanmugaraj" credentials="AI Researcher" affiliation="Flinders University, Adelaide" location="Australia" email="mada0090@fliders.edu.au" role="Associate Editor" />
+            <MemberCardPro name="Dr. Rajan John" credentials="Ph.D., Professor" affiliation="Department of Computer Science, Jazan University" location="Saudi Arabia" email="rsubbaiah@jazanu.edu.sa" role="Associate Editor" />
+            <MemberCardPro name="Dr. Nagarajan. S." credentials="Professor" affiliation="Department of Mechanical and Industrial Engineering, Bahir Dar University" location="Bahir Dar, Ethiopia" email="drnagarajans@bdu.edu.et" role="Associate Editor" />
+            <MemberCardPro name="Prof. Ravi Lanke" credentials="M.Tech., Chief Technical Officer (CTO)" affiliation="Lumbini Technologies" location="Vijayawada, India" email="ravikumarlanke@lumbinitechnologies.com" role="Associate Editor" />
             <MemberCardPro name="Dr. Durga Indira. N." credentials="Ph.D., PDF, Professor" affiliation="Department of Computer Science, ACE" location="India" email="durgaindira@acsce.edu.in" role="Associate Editor" />
             <MemberCardPro name="Dr. Venkatesh. K" credentials="Ph.D., Professor" affiliation="SASTRA Deemed University" location="India" email="havevenkat@src.sastra.edu" role="Associate Editor" />
             <MemberCardPro name="Dr. Shantha Kumar. D" credentials="Ph.D., Professor" affiliation="Saveetha University" location="India" email="Santhakumard.sse@savetha.com" role="Associate Editor" />
             <MemberCardPro name="Dr. Vanitha S." credentials="Ph.D., Professor" affiliation="PES University" location="Bangalore, India" email="svanitha@pes.edu" role="Associate Editor" />
-            <MemberCardPro name="Prof. Ravi Lanke" credentials="M.Tech., Chief Technical Officer (CTO)" affiliation="Lumbini Technologies" location="Vijayawada, India" email="ravikumarlanke@lumbinitechnologies.com" role="Associate Editor" />
           </div>
         </BoardSection>
 
@@ -130,9 +126,9 @@ export default function EditorialBoard() {
           onToggle={() => toggleSection('advisory')}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+            <MemberCardPro name="Ms. Giriyappagari Naga Sowmya" credentials="Data Engineer" affiliation="SARGAD" location="USA" />
             <MemberCardPro name="Mrs. Latha A" credentials="TL & Layout Manager" affiliation="Eximietas Design" location="India" />
             <MemberCardPro name="Mr. Veeramachaneni Dinesh" credentials="Senior Project Manager" affiliation="Xavient Technologies (TELUS)" location="India" />
-            <MemberCardPro name="Ms. Giriyappagari Naga Sowmya" credentials="Data Engineer" affiliation="SARGAD" location="USA" />
             <MemberCardPro name="Mr. Yashraj M." credentials="Managing Director" affiliation="LUMBINI Technologies" location="USA" />
             <MemberCardPro name="Mr. Ramesh Chigurupati" credentials="ETL Analyst" affiliation="DataPro" location="USA" />
             <MemberCardPro name="Mrs. Sathya. J. S." affiliation="Wipro Technologies" location="USA" />
@@ -168,7 +164,7 @@ export default function EditorialBoard() {
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             <MemberCardPro name="Dr. Shanmugavalli. V" credentials="Ph.D., Senior Assistant Professor" affiliation="MAHE" location="Bangalore, India" email="shanmugavalli.v@manipal.edu" />
-            <MemberCardPro name="Dr. Umamaheswaran. S." credentials="Ph.D., Professor" affiliation="New Horizon College (NHCE)" location="Bangalore, India" email="dr.umamaheswaran.nhce@newhorizonindia.edu" />
+            <MemberCardPro name="Dr. Umamaheswaran. S." credentials="Ph.D., Professor" affiliation="New Horizon College of Engineering (NHCE)" location="Bangalore, India" email="dr.umamaheswaran.nhce@newhorizonindia.edu" />
           </div>
         </BoardSection>
 
@@ -178,7 +174,7 @@ export default function EditorialBoard() {
           title="Digital Publishing & IT"
           icon={<Briefcase className="w-6 h-6" />}
           color="cyan"
-          description="Website functionality, submission systems, cybersecurity"
+          description="Maintain website functionality, manage submission systems, cybersecurity, hosting, technical troubleshooting, digital workflow"
           expanded={expandedSection === 'digital-it'}
           onToggle={() => toggleSection('digital-it')}
         >
@@ -193,7 +189,7 @@ export default function EditorialBoard() {
           title="Marketing & Communications"
           icon={<Briefcase className="w-6 h-6" />}
           color="pink"
-          description="Promotion strategies, newsletters, branding"
+          description="Develop promotion strategies, newsletters, branding, press releases"
           expanded={expandedSection === 'marketing'}
           onToggle={() => toggleSection('marketing')}
         >
@@ -208,7 +204,7 @@ export default function EditorialBoard() {
           title="Legal & Compliance"
           icon={<Briefcase className="w-6 h-6" />}
           color="red"
-          description="Contracts, copyright policies, regulatory compliance"
+          description="Handle contracts, copyright policies, licensing, regulatory compliance"
           expanded={expandedSection === 'legal'}
           onToggle={() => toggleSection('legal')}
         >
@@ -225,7 +221,7 @@ export default function EditorialBoard() {
           title="Data Protection & Privacy"
           icon={<Briefcase className="w-6 h-6" />}
           color="violet"
-          description="Data compliance, author/reviewer data security"
+          description="Ensure data compliance, manage author/reviewer data security"
           expanded={expandedSection === 'privacy'}
           onToggle={() => toggleSection('privacy')}
         >
@@ -241,7 +237,7 @@ export default function EditorialBoard() {
           title="Special Issues Committee"
           icon={<Briefcase className="w-6 h-6" />}
           color="teal"
-          description="Plan themed issues, coordinate special calls"
+          description="Plan themed issues, invite guest editors, coordinate special calls for papers"
           expanded={expandedSection === 'special-issues'}
           onToggle={() => toggleSection('special-issues')}
         >
@@ -257,7 +253,7 @@ export default function EditorialBoard() {
           title="Finance & Budget"
           icon={<Briefcase className="w-6 h-6" />}
           color="orange"
-          description="Budget planning, financial reporting, resource allocation"
+          description="Budget planning, expense tracking, financial reporting, resource allocation"
           expanded={expandedSection === 'finance'}
           onToggle={() => toggleSection('finance')}
         >
@@ -285,21 +281,20 @@ export default function EditorialBoard() {
   );
 }
 
-// Board Section Component with collapse/expand
 function BoardSection({ id, title, icon, color, description, children, expanded, onToggle }) {
   const colorClasses = {
-    indigo: 'from-indigo-500 to-indigo-600 border-indigo-200',
-    purple: 'from-purple-500 to-purple-600 border-purple-200',
-    blue: 'from-blue-500 to-blue-600 border-blue-200',
+    indigo:  'from-indigo-500 to-indigo-600 border-indigo-200',
+    purple:  'from-purple-500 to-purple-600 border-purple-200',
+    blue:    'from-blue-500 to-blue-600 border-blue-200',
     emerald: 'from-emerald-500 to-emerald-600 border-emerald-200',
-    amber: 'from-amber-500 to-amber-600 border-amber-200',
-    rose: 'from-rose-500 to-rose-600 border-rose-200',
-    cyan: 'from-cyan-500 to-cyan-600 border-cyan-200',
-    pink: 'from-pink-500 to-pink-600 border-pink-200',
-    red: 'from-red-500 to-red-600 border-red-200',
-    violet: 'from-violet-500 to-violet-600 border-violet-200',
-    teal: 'from-teal-500 to-teal-600 border-teal-200',
-    orange: 'from-orange-500 to-orange-600 border-orange-200',
+    amber:   'from-amber-500 to-amber-600 border-amber-200',
+    rose:    'from-rose-500 to-rose-600 border-rose-200',
+    cyan:    'from-cyan-500 to-cyan-600 border-cyan-200',
+    pink:    'from-pink-500 to-pink-600 border-pink-200',
+    red:     'from-red-500 to-red-600 border-red-200',
+    violet:  'from-violet-500 to-violet-600 border-violet-200',
+    teal:    'from-teal-500 to-teal-600 border-teal-200',
+    orange:  'from-orange-500 to-orange-600 border-orange-200',
   };
 
   return (
@@ -319,7 +314,7 @@ function BoardSection({ id, title, icon, color, description, children, expanded,
         </div>
         <ChevronDown className={`w-5 h-5 md:w-6 md:h-6 text-gray-400 transition-transform flex-shrink-0 ml-2 ${expanded ? 'rotate-180' : ''}`} />
       </button>
-      
+
       {expanded && (
         <div className="p-3 sm:p-4 md:p-6 pt-0 border-t border-gray-100">
           {children}
@@ -329,7 +324,6 @@ function BoardSection({ id, title, icon, color, description, children, expanded,
   );
 }
 
-// Professional Member Card
 function MemberCardPro({ name, credentials, affiliation, location, email, role, featured }) {
   return (
     <div className={`group relative bg-white rounded-xl border-2 ${featured ? 'border-indigo-200 bg-gradient-to-br from-indigo-50 to-white' : 'border-gray-100'} p-4 md:p-6 hover:shadow-xl hover:border-indigo-300 transition-all duration-300`}>
@@ -340,34 +334,34 @@ function MemberCardPro({ name, credentials, affiliation, location, email, role, 
           </div>
         </div>
       )}
-      
+
       <div className="flex items-start gap-3 md:gap-4">
         <div className="flex-shrink-0">
           <div className={`w-11 h-11 md:w-14 md:h-14 rounded-full ${featured ? 'bg-gradient-to-br from-indigo-500 to-purple-500' : 'bg-gradient-to-br from-gray-400 to-gray-500'} flex items-center justify-center text-white text-base md:text-xl font-bold shadow-md`}>
             {name.charAt(0)}
           </div>
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors leading-tight text-sm md:text-base">
             {name}
           </h3>
-          
+
           {role && (
             <p className="text-xs font-semibold text-indigo-600 mb-1.5">{role}</p>
           )}
-          
+
           {credentials && (
             <p className="text-xs md:text-sm text-gray-600 mb-2 leading-snug">{credentials}</p>
           )}
-          
+
           {affiliation && (
             <div className="flex items-start gap-1.5 text-xs text-gray-500 mb-1">
               <Building2 className="w-3 h-3 md:w-3.5 md:h-3.5 mt-0.5 flex-shrink-0" />
               <span className="leading-snug">{affiliation}</span>
             </div>
           )}
-          
+
           {location && (
             <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
               <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
