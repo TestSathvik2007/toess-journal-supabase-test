@@ -36,6 +36,10 @@ export default function AdminReviewDecisions() {
   const [filter, setFilter] = useState("all");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // ✅ FIX: Volume + Issue state for publishing
+  const [pubVolume, setPubVolume] = useState(1);
+  const [pubIssue, setPubIssue] = useState(1);
+
   useEffect(() => {
     getCurrentUser().then(user => setEditorId(user?.id));
     loadPapers();
@@ -68,7 +72,6 @@ export default function AdminReviewDecisions() {
     try {
       await makeEditorialDecision(selectedPaper.id, editorId, decision, comments);
       
-      // Queue decision email with proper data
       try {
         const authorEmail = selectedPaper.users?.email;
         const authorName = `${selectedPaper.users?.given_name || ""} ${selectedPaper.users?.family_name || ""}`.trim();
@@ -109,14 +112,18 @@ export default function AdminReviewDecisions() {
   const handlePublish = async () => {
     setSubmitting(true);
     try {
+      // ✅ FIX: Include volume, issue, and published_year
+      const year = new Date().getFullYear();
       const publishData = {
         status: "published",
+        volume: pubVolume,
+        issue: pubIssue,
+        published_year: year,
         updated_at: new Date().toISOString(),
       };
 
       await updateSubmission(publishingPaper.id, publishData);
 
-      // Queue published email with proper data
       try {
         const authorEmail = publishingPaper.users?.email;
         const authorName = `${publishingPaper.users?.given_name || ""} ${publishingPaper.users?.family_name || ""}`.trim();
@@ -339,7 +346,7 @@ export default function AdminReviewDecisions() {
                         )}
                         {paper.editorialDecision === "accept" && paper.status !== "published" && (
                           <button
-                            onClick={() => setPublishingPaper(paper)}
+                            onClick={() => { setPublishingPaper(paper); setPubVolume(1); setPubIssue(1); }}
                             className="flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition"
                           >
                             <Share2 className="w-4 h-4" /> Publish
@@ -536,6 +543,36 @@ export default function AdminReviewDecisions() {
                   </a>
                 </div>
               )}
+
+              {/* ✅ FIX: Volume + Issue assignment inputs */}
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">Assign Volume & Issue</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Volume</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={pubVolume}
+                      onChange={(e) => setPubVolume(Number(e.target.value))}
+                      className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-green-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Issue</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={pubIssue}
+                      onChange={(e) => setPubIssue(Number(e.target.value))}
+                      className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-green-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 mt-1.5">
+                  Will be published as Vol. {pubVolume}, Issue {pubIssue} ({new Date().getFullYear()})
+                </p>
+              </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-900">

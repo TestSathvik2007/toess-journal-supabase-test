@@ -215,6 +215,23 @@ const templates: Record<string, (n: any) => { subject: string; html: string }> =
       <p style="margin-top:20px">Thank you for your valuable contribution to TOESS!</p>
     `),
     }),
+
+    contact_form: (n) => ({
+      subject: n.subject || "New Contact Form Message — TOESS",
+      html: base(`
+      <p>Dear Editorial Team,</p>
+      <p>A new message has been submitted via the TOESS contact form.</p>
+      <div class="box">
+        <p><strong>From:</strong> ${n.author_name || "Unknown"}</p>
+        <p><strong>Email:</strong> ${n.author_email || "N/A"}</p>
+        <p><strong>Subject:</strong> ${n.subject || "N/A"}</p>
+      </div>
+      <div class="divider"></div>
+      <p><strong>Message:</strong></p>
+      <div class="box"><p style="white-space:pre-wrap">${n.message || ""}</p></div>
+      <p style="margin-top:20px">Please reply directly to <a href="mailto:${n.author_email}">${n.author_email}</a> to respond.</p>
+    `),
+    }),
   };
 
 const sendViaResend = async (to: string, subject: string, html: string) => {

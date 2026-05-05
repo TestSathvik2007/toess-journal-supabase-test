@@ -5,55 +5,24 @@ import { Link } from "react-router-dom";
 
 export default function Guidelines() {
   const submissionSteps = [
-    {
-      step: "1",
-      title: "Prepare Your Manuscript",
-      description: "Format your paper according to COPE standards and our template.",
-      icon: FileText
-    },
-    {
-      step: "2",
-      title: "Online Submission",
-      description: "Submit through our online system with no submission fee.",
-      icon: Upload
-    },
-    {
-      step: "3",
-      title: "Peer Review",
-      description: "Anonymous expert review (typically 21 days).",
-      icon: Clock
-    },
-    {
-      step: "4",
-      title: "Publication",
-      description: "Open access publication with unique DOI.",
-      icon: CheckCircle
-    }
+    { step: "1", title: "Prepare Your Manuscript", description: "Format your paper according to COPE standards and our template.", icon: FileText },
+    { step: "2", title: "Online Submission", description: "Submit through our online system with no submission fee.", icon: Upload },
+    { step: "3", title: "Peer Review", description: "Anonymous expert review (typically 21 days).", icon: Clock },
+    { step: "4", title: "Publication", description: "Open access publication with unique DOI.", icon: CheckCircle }
   ];
 
   return (
-    <SidebarLayout
-      title="Author Guidelines"
-      subtitle="Transaction on Evolutionary Smart Systems"
-      icon={FileText}
-    >
+    <SidebarLayout title="Author Guidelines" subtitle="Transaction on Evolutionary Smart Systems" icon={FileText}>
       <div className="space-y-12">
+
         {/* Quick Links */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-lg p-6">
           <h3 className="font-bold text-slate-900 mb-4">Quick Links</h3>
           <div className="flex flex-wrap gap-3">
-            <a href="#preparation" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">
-              Manuscript Preparation
-            </a>
-            <a href="#submission" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">
-              Submission Process
-            </a>
-            <a href="#review" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">
-              Review Process
-            </a>
-            <a href="#copyright" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">
-              Copyright
-            </a>
+            <a href="#preparation" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">Manuscript Preparation</a>
+            <a href="#submission" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">Submission Process</a>
+            <a href="#review" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">Review Process</a>
+            <a href="#copyright" className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium">Copyright</a>
           </div>
         </div>
 
@@ -93,8 +62,34 @@ export default function Guidelines() {
             <BookOpen className="w-8 h-8 text-indigo-600" />
             <h2 className="text-2xl font-bold text-slate-900">Manuscript Preparation</h2>
           </div>
-          
+
           <div className="space-y-6">
+
+            {/* ── Manuscript Template ── */}
+            <div className="bg-gradient-to-br from-indigo-900 to-blue-900 rounded-xl p-6 border border-indigo-700">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Download className="w-5 h-5 text-indigo-300" />
+                    <h3 className="text-lg font-bold text-white">Official Manuscript Template</h3>
+                  </div>
+                  <p className="text-sm text-indigo-200">
+                    Download the official ToESS template and use it as your starting point.
+                    All submissions must follow this structure.
+                  </p>
+                </div>
+                <a
+                  href="/ToESS_Manuscript_Template.docx"
+                  download
+                  className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-white text-indigo-800 font-semibold rounded-lg hover:bg-indigo-50 transition text-sm shadow"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Template (.docx)
+                </a>
+              </div>
+            </div>
+
+            {/* Format Requirements */}
             <div>
               <h3 className="text-lg font-bold text-slate-900 mb-3">Format Requirements</h3>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -119,6 +114,7 @@ export default function Guidelines() {
               </div>
             </div>
 
+            {/* Manuscript Structure */}
             <div>
               <h3 className="text-lg font-bold text-slate-900 mb-3">Manuscript Structure</h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -148,7 +144,6 @@ export default function Guidelines() {
             <Send className="w-8 h-8 text-indigo-600" />
             <h2 className="text-2xl font-bold text-slate-900">Submission Requirements</h2>
           </div>
-          
           <div className="space-y-4">
             <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
               <div className="flex items-start gap-3">
@@ -159,7 +154,6 @@ export default function Guidelines() {
                 </div>
               </div>
             </div>
-
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-6 bg-slate-50 rounded-lg border border-slate-200">
                 <h3 className="font-semibold text-slate-900 mb-3">Cover Letter</h3>
@@ -179,8 +173,7 @@ export default function Guidelines() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="p-6 bg-indigo-50 rounded-lg border border-indigo-200">
               <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-600" />
-                Images
+                <FileText className="w-5 h-5 text-indigo-600" /> Images
               </h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li>• Submit <strong>high-resolution</strong> images</li>
@@ -190,8 +183,7 @@ export default function Guidelines() {
             </div>
             <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
               <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-600" />
-                Tables
+                <FileText className="w-5 h-5 text-blue-600" /> Tables
               </h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li>• Supply tables with legends</li>
@@ -208,7 +200,6 @@ export default function Guidelines() {
             <Clock className="w-8 h-8 text-indigo-600" />
             <h2 className="text-2xl font-bold text-slate-900">Review and Decision Process</h2>
           </div>
-          
           <div className="space-y-6">
             <div className="grid md:grid-cols-3 gap-6">
               <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
@@ -227,15 +218,12 @@ export default function Guidelines() {
                 <p className="text-sm text-slate-600">Accept, revise, or reject</p>
               </div>
             </div>
-
             <div className="bg-gradient-to-r from-indigo-100 to-blue-100 rounded-lg p-6 border border-indigo-200">
               <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-indigo-600" />
-                Timeline
+                <Clock className="w-5 h-5 text-indigo-600" /> Timeline
               </h3>
               <p className="text-slate-700">The review process typically takes <strong>21 days</strong>, subject to reviewer availability.</p>
             </div>
-
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 flex gap-4">
               <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0" />
               <div>
@@ -275,7 +263,6 @@ export default function Guidelines() {
             <Scale className="w-8 h-8 text-indigo-600" />
             <h2 className="text-2xl font-bold text-slate-900">Copyright and Licensing</h2>
           </div>
-          
           <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6 mb-4">
             <ul className="space-y-3 text-slate-700">
               <li className="flex items-start gap-2">
@@ -292,10 +279,7 @@ export default function Guidelines() {
               </li>
             </ul>
           </div>
-          <Link
-            to="/copyright-policy"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 underline underline-offset-2"
-          >
+          <Link to="/copyright-policy" className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 underline underline-offset-2">
             <Scale className="w-4 h-4" />
             Read the full Copyright & Licensing Policy →
           </Link>
@@ -304,9 +288,7 @@ export default function Guidelines() {
         {/* Reference Style */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Reference Style</h2>
-          <p className="text-slate-700">
-            Adhere to the specific formatting for various types of references, as detailed on our website.
-          </p>
+          <p className="text-slate-700">Adhere to the specific formatting for various types of references, as detailed on our website.</p>
         </div>
 
         {/* Call to Action */}
@@ -316,22 +298,17 @@ export default function Guidelines() {
             For any inquiries or issues during submission, please contact us via the email provided on our website.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <a 
-              href="/submit" 
-              className="px-8 py-3 bg-white text-indigo-900 font-semibold rounded-lg hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
+            <a href="/submit" className="px-8 py-3 bg-white text-indigo-900 font-semibold rounded-lg hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2">
               <Upload className="w-5 h-5" />
               Submit Your Paper
             </a>
-            <a 
-              href="/contact" 
-              className="px-8 py-3 bg-indigo-800 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all border-2 border-white/30 hover:border-white/50 flex items-center gap-2"
-            >
+            <a href="/contact" className="px-8 py-3 bg-indigo-800 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all border-2 border-white/30 hover:border-white/50 flex items-center gap-2">
               <Send className="w-5 h-5" />
               Contact Editorial Team
             </a>
           </div>
         </div>
+
       </div>
     </SidebarLayout>
   );

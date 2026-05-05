@@ -14,6 +14,7 @@ export default function Navbar() {
   const [archivesOpen, setArchivesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
+  const archivesRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,10 +32,21 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Close user dropdown on outside click
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
         setDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Close archives dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (archivesRef.current && !archivesRef.current.contains(e.target))
+        setArchivesOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -56,10 +68,10 @@ export default function Navbar() {
   ];
 
   const archiveLinks = [
-    { to: "/archives/latest",  label: "Latest Articles",     icon: <FileText size={14} /> },
-    { to: "/archives/current", label: "Current Issue",       icon: <BookOpen size={14} /> },
+    { to: "/archives/latest",  label: "Latest Articles",      icon: <FileText size={14} /> },
+    { to: "/archives/current", label: "Current Issue",        icon: <BookOpen size={14} /> },
     { to: "/archives/volumes", label: "All Volumes & Issues", icon: <ChevronRight size={14} /> },
-    { to: "/archives/special", label: "Special Issues",      icon: <Star size={14} /> },
+    { to: "/archives/special", label: "Special Issues",       icon: <Star size={14} /> },
   ];
 
   return (
@@ -255,14 +267,11 @@ export default function Navbar() {
               Home
             </NavLink>
 
-            {/* Archives dropdown */}
-            <div
-              className="nb-arc-wrap"
-              onMouseEnter={() => setArchivesOpen(true)}
-              onMouseLeave={() => setArchivesOpen(false)}
-            >
+            {/* Archives dropdown — click to toggle */}
+            <div className="nb-arc-wrap" ref={archivesRef}>
               <button
                 className={`nb-arc-btn${location.pathname.startsWith("/archives") ? " arc-active" : ""}`}
+                onClick={() => setArchivesOpen((v) => !v)}
               >
                 Archives
                 <ChevronDown size={13} className={`nb-arc-chevron${archivesOpen ? " open" : ""}`} />

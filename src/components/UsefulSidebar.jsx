@@ -100,7 +100,6 @@ export default function UsefulSidebar() {
         <h4 className="font-bold text-slate-900 mb-4 text-sm">Journal Metrics</h4>
         <div className="space-y-3">
           {[
-            { label: "Impact Factor", value: "3.45" },
             { label: "Review Time", value: "2-4 weeks" },
             { label: "Acceptance Rate", value: "45%" },
           ].map((stat, i) => (
